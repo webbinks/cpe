@@ -1,0 +1,18 @@
+{
+    "name": "webbinks/cpe",
+    "description": "Test",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Gerson Brañez Chavez",
+            "email": "site.gerson@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+    		"psr-4": {
+    				"Cpe\\": "src/"
+    		}
+    }
+}
