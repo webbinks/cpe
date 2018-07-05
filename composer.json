@@ -1,6 +1,7 @@
 {
     "name": "webbinks/cpe",
     "description": "Test",
+    "minimum-stability": "dev",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -10,8 +11,6 @@
         }
     ],
     "require": {},
-    "minimum-stability" : "dev",
-    "version": "1.0.0",
     "autoload": {
     		"psr-4": {
     				"Cpe\\": "src/"
