@@ -1,9 +1,10 @@
 {
     "name": "webbinks/cpe",
     "description": "Test",
-    "minimum-stability": "dev",
     "type": "library",
     "license": "MIT",
+    "minimum-stability": "dev",
+    "version": "1.0.0",
     "authors": [
         {
             "name": "Gerson Brañez Chavez",
