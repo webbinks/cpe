@@ -26,6 +26,12 @@ class Item
 
 	private $numeroPlacaVehiculo;
 
+	private $conceptoTributario;
+
+	private $codigoConceptoTributario;
+
+	private $conceptoTributarioAdicional;
+
 	private $descripcion;
 
 	private $valorUnitario;
@@ -103,6 +109,27 @@ class Item
 	public function setNumeroPlacaVehiculo($numeroPlacaVehiculo = '')
 	{
 		$this->numeroPlacaVehiculo = $numeroPlacaVehiculo;
+
+		return $this;
+	}
+
+	public function setConceptoTributario($conceptoTributario = '')
+	{
+		$this->conceptoTributario = $conceptoTributario;
+
+		return $this;
+	}
+
+	public function setCodigoConceptoTributario($codigoConceptoTributario = '')
+	{
+		$this->codigoConceptoTributario = $codigoConceptoTributario;
+
+		return $this;
+	}
+
+	public function setConceptoTributarioAdicional($conceptoTributarioAdicional = '')
+	{
+		$this->conceptoTributarioAdicional = $conceptoTributarioAdicional;
 
 		return $this;
 	}
@@ -214,6 +241,21 @@ class Item
 	public function getNumeroPlacaVehiculo()
 	{
 		return $this->numeroPlacaVehiculo;
+	}
+
+	public function getConceptoTributario()
+	{
+		return $this->conceptoTributario;
+	}
+
+	public function getCodigoConceptoTributario()
+	{
+		return $this->codigoConceptoTributario;
+	}
+
+	public function getConceptoTributarioAdicional()
+	{
+		return $this->conceptoTributarioAdicional;
 	}
 
 	public function getDescripcion()

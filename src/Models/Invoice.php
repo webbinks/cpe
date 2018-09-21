@@ -78,7 +78,7 @@ class Invoice implements ModelInterface
 	{
 		$this->content[] = (new Element(CBC, 'InvoiceTypeCode'))->setAttribute('listID', $tipoOperacion)
 																														->setAttribute('listAgencyName', 'PE:SUNAT')
-																														->setAttribute('listName', 'SUNAT:Identificador de Tipo de Documento')
+																														->setAttribute('listName', 'Tipo de Documento')
 																														->setAttribute('listURI', 'urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo01')
 																														->setValue($tipoDocumento);
 
@@ -898,11 +898,8 @@ class Invoice implements ModelInterface
 					                       'http://www.w3.org/2000/09/xmldsig#' => 'ds',
 					                       'urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2' => 'ext',
 																 'urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2' => 'qdt',
-					                       //'urn:sunat:names:specification:ubl:peru:schema:xsd:SunatAggregateComponents-1'=>'sac',
 																 'urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2' => 'udt',
 																 'http://www.w3.org/2001/XMLSchema-instance' => 'xsi'];
-
-		//$xmlService->namespaceMap = NAMESPACEMAP;
 
   	$strXML = $xmlService->write($this->element, $this);
 

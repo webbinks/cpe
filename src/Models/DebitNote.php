@@ -7,9 +7,9 @@ use Cpe\Elements\Element;
 use Sabre\Xml\Writer;
 use Sabre\Xml\Service;
 
-class CreditNote implements ModelInterface
+class DebitNote implements ModelInterface
 {
-	private $element = 'CreditNote';
+	private $element = 'DebitNote';
 
 	private $currencyID = '';
 
@@ -90,16 +90,16 @@ class CreditNote implements ModelInterface
 		return $this;
 	}
 
-	public function setDiscrepancyResponse($notaCredito)
+	public function setDiscrepancyResponse($notaDebito)
 	{
 		$DiscrepancyResponse = new Element(CAC, 'DiscrepancyResponse');
 
 		$DiscrepancyResponse->setValue((new Element(CBC, 'ResponseCode'))->setAttribute('listAgencyName', 'PE:SUNAT')
-																																		 ->setAttribute('listName', 'Tipo de nota de credito')
+																																		 ->setAttribute('listName', 'Tipo de nota de debito')
 																																		 ->setAttribute('listURI', 'urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo09')
-																																		 ->setValue($notaCredito['tipo']));
+																																		 ->setValue($notaDebito['tipo']));
 
-		$DiscrepancyResponse->setValue((new Element(CBC, 'Description'))->setValue($notaCredito['motivo_sustento']));
+		$DiscrepancyResponse->setValue((new Element(CBC, 'Description'))->setValue($notaDebito['motivo_sustento']));
 
 		$this->content[] = $DiscrepancyResponse;
 
@@ -296,56 +296,49 @@ class CreditNote implements ModelInterface
 		return $TaxSubtotal;
 	}
 
-	public function setLegalMonetaryTotal($montosTotales)
+	public function setRequestedMonetaryTotal($montosTotales)
 	{
-		$LegalMonetaryTotal = new Element(CAC, 'LegalMonetaryTotal');
+		$RequestedMonetaryTotal = new Element(CAC, 'RequestedMonetaryTotal');
 		
-		if($montosTotales->getTotalDescuentos() != '')
-		{
-			$AllowanceTotalAmount = (new Element(CBC, 'AllowanceTotalAmount'))->setAttribute('currencyID', $this->currencyID)->setValue($montosTotales->getTotalDescuentos());
-
-			$LegalMonetaryTotal->setValue($AllowanceTotalAmount);
-		}
-
 		if($montosTotales->getTotalOtrosCargos() != '')
 		{
 			$ChargeTotalAmount = (new Element(CBC, 'ChargeTotalAmount'))->setAttribute('currencyID', $this->currencyID)->setValue($montosTotales->getTotalOtrosCargos());
 
-			$LegalMonetaryTotal->setValue($ChargeTotalAmount);
+			$RequestedMonetaryTotal->setValue($ChargeTotalAmount);
 		}
 
 		if($montosTotales->getImporteTotal() != '')
 		{			
 			$PayableAmount = (new Element(CBC, 'PayableAmount'))->setAttribute('currencyID', $this->currencyID)->setValue($montosTotales->getImporteTotal());
 
-			$LegalMonetaryTotal->setValue($PayableAmount);
+			$RequestedMonetaryTotal->setValue($PayableAmount);
 		}
 
-		$this->content[] = $LegalMonetaryTotal;
+		$this->content[] = $RequestedMonetaryTotal;
 
 		return $this;
 	}
 
-	public function setCreditNoteLine($items)
+	public function setDebitNoteLine($items)
 	{
 		foreach ($items as $item)
 		{
-			$CreditNoteLine = new Element(CAC, 'CreditNoteLine');
+			$DebitNoteLine = new Element(CAC, 'DebitNoteLine');
 
 			$ID = (new Element(CBC, 'ID'))->setValue($item->getNumeroItem());
 
-			$CreditNoteLine->setValue($ID);
+			$DebitNoteLine->setValue($ID);
 
-			$CreditedQuantity = (new Element(CBC, 'CreditedQuantity'))->setAttribute('unitCode', $item->getCodigoUnidadMedida())
+			$DebitedQuantity = (new Element(CBC, 'DebitedQuantity'))->setAttribute('unitCode', $item->getCodigoUnidadMedida())
 																																->setAttribute('unitCodeListID', 'UN/ECE rec 20')
 																																->setAttribute('unitCodeListAgencyName', 'United Nations Economic Commission for Europe')
 																																->setValue($item->getCantidad());
 
-			$CreditNoteLine->setValue($CreditedQuantity);
+			$DebitNoteLine->setValue($DebitedQuantity);
 
 			$LineExtensionAmount = (new Element(CBC, 'LineExtensionAmount'))->setAttribute('currencyID', $this->currencyID)->setValue($item->getValorVenta());
 
-			$CreditNoteLine->setValue($LineExtensionAmount);
+			$DebitNoteLine->setValue($LineExtensionAmount);
 
 			$PricingReference = new Element(CAC, 'PricingReference');
 
@@ -359,11 +352,11 @@ class CreditNote implements ModelInterface
 
 			$PricingReference->setValue($AlternativeConditionPrice);
 
-			$CreditNoteLine->setValue($PricingReference);
+			$DebitNoteLine->setValue($PricingReference);
 
 			$TaxTotal = $this->setTaxTotal($item->getMontoTotal(), $item->getTaxSubTotal());
 
-			$CreditNoteLine->setValue($TaxTotal);
+			$DebitNoteLine->setValue($TaxTotal);
 
 			$Item = new Element(CAC, 'Item');
 
@@ -404,13 +397,13 @@ class CreditNote implements ModelInterface
 				$Item->setValue($AdditionalItemProperty);
 			}
 
-			$CreditNoteLine->setValue($Item);
+			$DebitNoteLine->setValue($Item);
 
 			$Price = (new Element(CAC, 'Price'))->setValue((new Element(CBC, 'PriceAmount'))->setAttribute('currencyID', $this->currencyID)->setValue($item->getValorUnitario()));
 
-			$CreditNoteLine->setValue($Price);
+			$DebitNoteLine->setValue($Price);
 
-			$this->content[] = $CreditNoteLine;
+			$this->content[] = $DebitNoteLine;
 		}
 
 		return $this;
@@ -425,7 +418,7 @@ class CreditNote implements ModelInterface
   {
   	$xmlService = new Service();
 
-  	$xmlService->namespaceMap = ['urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2' => '',
+  	$xmlService->namespaceMap = ['urn:oasis:names:specification:ubl:schema:xsd:DebitNote-2' => '',
 					                       'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2' => 'cac',
 					                       'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2' => 'cbc',
 																 'urn:un:unece:uncefact:documentation:2' => 'ccts',

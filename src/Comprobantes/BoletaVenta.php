@@ -3,17 +3,20 @@
 namespace Cpe\Comprobantes;
 
 use Cpe\ComprobanteInterface;
-use Cpe\Models\CreditNote;
+use Cpe\Models\Invoice;
 use Cpe\Components\Leyenda;
 use Cpe\Components\Cliente;
 use Cpe\Components\Emisor;
+use Cpe\Components\Descuentos;
 use Cpe\Components\SubTotalImpuesto;
 use Cpe\Components\MontosTotales;
 use Cpe\Components\Item;
+use Cpe\Components\Detraccion;
+use Cpe\Components\Anticipo;
 
-class NotaCredito implements ComprobanteInterface
+class BoletaVenta implements ComprobanteInterface
 {
-	private $creditNote;
+	private $invoice;
 
 	private $signature;
 
@@ -33,9 +36,7 @@ class NotaCredito implements ComprobanteInterface
 
 	private $leyendas;
 
-	private $notaCredito;
-
-	private $documentoModifica;
+	private $numeroOrdenCompra;
 
 	private $guias;
 
@@ -53,16 +54,22 @@ class NotaCredito implements ComprobanteInterface
 
 	private $montosTotales;
 
+	private $numeroItem;
+
 	private $item;
+
+	private $detraccion;
+
+	private $anticipo;
 
 	public function __construct()
 	{
-		$this->creditNote = new creditNote();
+		$this->invoice = new Invoice();
 
-		$this->creditNote->setUBLExtensions();
-		$this->creditNote->setUBLVersionID();
-		$this->creditNote->setCustomizacionID();
-		$this->setTipoDocumento('07');
+		$this->invoice->setUBLExtensions();
+		$this->invoice->setUBLVersionID();
+		$this->invoice->setCustomizacionID();
+		$this->setTipoDocumento('03');
 
 		return $this;
 	}
@@ -124,16 +131,9 @@ class NotaCredito implements ComprobanteInterface
 		return $this;
 	}
 
-	public function setNotaCredito($tipoNotaCredito = '', $motivoSustento = '')
+	public function setNumeroOrdenCompra($numeroOrdenCompra = '')
 	{
-		$this->notaCredito = ['tipo' => $tipoNotaCredito, 'motivo_sustento' => $motivoSustento];
-
-		return $this;
-	}
-
-	public function setDocumentoModifica($codigo = '', $nroDocumento = '')
-	{
-		$this->documentoModifica = ['codigo' => $codigo, 'nro_documento' => $nroDocumento];
+		$this->numeroOrdenCompra = $numeroOrdenCompra;
 
 		return $this;
 	}
@@ -164,6 +164,20 @@ class NotaCredito implements ComprobanteInterface
 	public function setCliente(Cliente $cliente)
 	{
 		$this->cliente = $cliente;
+
+		return $this;
+	}
+
+	//ojo
+	/*public function setLugarEntrega()
+	{}*/
+
+	/*
+	Información de descuentos Globales
+	*/
+	public function setDescuentos(Descuentos $descuentos)
+	{
+		$this->descuentos = $descuentos;
 
 		return $this;
 	}
@@ -209,6 +223,13 @@ class NotaCredito implements ComprobanteInterface
 		return $this;
 	}
 
+	public function setImporteTotalVenta($importeTotalVenta = '')
+	{
+		$this->valoresTotales['importe_total_venta'] = $importeTotalVenta;
+
+		return $this;
+	}
+
 	public function setNumeroItem($numeroItem = '')
 	{
 		$this->numeroItem = $numeroItem;
@@ -223,24 +244,44 @@ class NotaCredito implements ComprobanteInterface
 		return $this;
 	}
 
+	public function setDetraccion(Detraccion $detraccion)
+	{
+		$this->detraccion = $detraccion;
+
+		return $this;
+	}
+
+	public function setAnticipo(Anticipo $anticipo)
+	{
+		$this->anticipo = $anticipo;
+
+		return $this;
+	}
+
 	private function prepareDocumento()
 	{
-		$this->creditNote->setID($this->serieCorrelativo)
-										 ->setIssueDate($this->fechaEmision)
-										 ->setIssueTime($this->horaEmision)
-										 ->setInvoiceTypeCode($this->tipoDocumento, $this->tipoOperacion)
-										 ->setNote($this->leyendas)
-										 ->setDocumentCurrencyCode($this->tipoMoneda)
-										 ->setDiscrepancyResponse($this->notaCredito)
-										 ->setBillingReference($this->documentoModifica)
-										 ->setDespatchDocumentReference($this->guias)																																																								
-										 ->setAdditionalDocumentReference($this->otroDocumento)
-										 ->setSignature($this->signature)
-										 ->setAccountingSupplierParty($this->emisor)
-										 ->setAccountingCustomerParty($this->cliente)
-										 ->setTaxTotal($this->totalImpuestos, $this->subTotalImpuesto, false)
-										 ->setLegalMonetaryTotal($this->montosTotales)
-										 ->setCreditNoteLine($this->item);
+		$this->invoice->setID($this->serieCorrelativo)
+									->setIssueDate($this->fechaEmision)
+									->setIssueTime($this->horaEmision)
+									->setInvoiceTypeCode($this->tipoDocumento, $this->tipoOperacion)
+									->setNote($this->leyendas)
+									->setDocumentCurrencyCode($this->tipoMoneda)
+									->setLineCountNumeric($this->numeroItem)
+									//->setInvoicePeriod()
+									->setOrderReference($this->numeroOrdenCompra)
+									->setDespatchDocumentReference($this->guias)																																																								
+									->setAdditionalDocumentReference($this->otroDocumento)
+									->setAdditionalDocumentReference($this->anticipo, 2)
+									->setSignature($this->signature)
+									->setAccountingSupplierParty($this->emisor)
+									->setAccountingCustomerParty($this->cliente)
+									->setPaymentMeans($this->detraccion)
+									->setPaymentTerms($this->detraccion)
+									->setPrepaidPayment($this->anticipo)
+									->setAllowancecharge($this->descuentos, false)
+									->setTaxTotal($this->totalImpuestos, $this->subTotalImpuesto, false)
+									->setLegalMonetaryTotal($this->montosTotales)
+									->setInvoiceLine($this->item);
 
 		return $this;
 	}
@@ -250,6 +291,6 @@ class NotaCredito implements ComprobanteInterface
 	{
 		$this->prepareDocumento();
 
-		return $this->creditNote->getXml();
+		return $this->invoice->getXml();
 	}
 }
