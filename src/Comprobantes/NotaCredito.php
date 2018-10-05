@@ -228,7 +228,6 @@ class NotaCredito implements ComprobanteInterface
 		$this->creditNote->setID($this->serieCorrelativo)
 										 ->setIssueDate($this->fechaEmision)
 										 ->setIssueTime($this->horaEmision)
-										 ->setInvoiceTypeCode($this->tipoDocumento, $this->tipoOperacion)
 										 ->setNote($this->leyendas)
 										 ->setDocumentCurrencyCode($this->tipoMoneda)
 										 ->setDiscrepancyResponse($this->notaCredito)

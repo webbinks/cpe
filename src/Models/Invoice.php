@@ -243,7 +243,6 @@ class Invoice implements ModelInterface
 		$this->content[] = $Signature;
 
 		return $this;
-
 	}
 
 	public function setAccountingSupplierParty($emisor)
@@ -256,10 +255,14 @@ class Invoice implements ModelInterface
 
 		$PartyName = (new Element(CAC, 'PartyName'))->setValue((new Element(CBC, 'Name'))->setValue($emisor->getNombreComercial()));
 
-		$PartyLegalEntity = (new Element(CAC, 'PartyLegalEntity'))->setValue((new Element(CBC, 'RegistrationName'))->setValue($emisor->getRazonSocial()))
-																															->setValue((new Element(CAC, 'RegistrationAddress'))->setValue((new Element(CBC, 'AddressTypeCode'))->setAttribute('listAgencyName', 'PE:SUNAT')
-																																																																																	->setAttribute('listName', 'Establecimientos anexos')
-																																																																																	->setValue($emisor->getCodigoDomicilioFiscal())));
+		$PartyLegalEntity = (new Element(CAC, 'PartyLegalEntity'))->setValue((new Element(CBC, 'RegistrationName'))->setValue($emisor->getRazonSocial()));
+
+		if($emisor->getCodigoDomicilioFiscal() != '')
+		{
+			$PartyLegalEntity->setValue((new Element(CAC, 'RegistrationAddress'))->setValue((new Element(CBC, 'AddressTypeCode'))->setAttribute('listAgencyName', 'PE:SUNAT')
+																																																													 ->setAttribute('listName', 'Establecimientos anexos')
+																																																													 ->setValue($emisor->getCodigoDomicilioFiscal())));
+		}
 
 		$this->content[] = (new Element(CAC, 'AccountingSupplierParty'))->setValue((new Element(CAC, 'Party'))->setValue($PartyIdentification)->setValue($PartyName)->setValue($PartyLegalEntity));
 		
@@ -467,9 +470,12 @@ class Invoice implements ModelInterface
 
 			$Item->setValue($Description);
 
-			$SellersItemIdentification = (new Element(CAC, 'SellersItemIdentification'))->setValue((new Element(CBC, 'ID'))->setValue($item->getCodigoProducto()));
+			if($item->getCodigoProducto() != '')
+			{				
+				$SellersItemIdentification = (new Element(CAC, 'SellersItemIdentification'))->setValue((new Element(CBC, 'ID'))->setValue($item->getCodigoProducto()));
 
-			$Item->setValue($SellersItemIdentification);
+				$Item->setValue($SellersItemIdentification);
+			}
 
 			if($item->getCodigoProductoGS() != '')
 			{				
